@@ -1,4 +1,5 @@
 <p>
     {{goal.description}}
 </p>
+<p>This goal is {{goal.completeDate|dateCount}}</p>
 <button (click)='goalComplete(true)'>Complete</button>
