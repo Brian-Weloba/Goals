@@ -1,3 +1,5 @@
+import { QuoteRequestService } from './../quote-http/quote-request.service';
+import { AlertService } from './../alert-service/alert.service';
 import { HttpClient } from '@angular/common/http';
 import { Quote } from './../quote-class/quote';
 import { Component, OnInit } from '@angular/core';
@@ -11,6 +13,7 @@ import { Goal } from '../goal';
 })
 export class GoalComponent implements OnInit {
 
+  alertService: AlertService;
   quote: Quote;
   goals: Goal[] = [
     new Goal(1, 'Watch finding Nemo', 'Find an online version and watch merlin find his son', new Date(2021, 9, 14)),
@@ -31,7 +34,8 @@ export class GoalComponent implements OnInit {
       let toDelete = confirm(`Are you sure you want to delete ${this.goals[index].name}?`);
 
       if (toDelete) {
-        this.goals.splice(index, 1)
+        this.goals.splice(index, 1);
+        this.alertService.alertMe("The goal has been deleted");
       }
     }
   }
@@ -43,22 +47,13 @@ export class GoalComponent implements OnInit {
     this.goals.push(goal)
   }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, alertService: AlertService, private quotesService: QuoteRequestService) {
+    this.alertService = alertService;
+  }
 
   ngOnInit() {
 
-    interface ApiResponse {
-      author: string;
-      quote: string;
-    }
-
-    this.http.get<ApiResponse>("http://quotes.stormconsultancy.co.uk/random.json").subscribe(data => {
-      //successful API request
-      this.quote = new Quote(data.author, data.quote)
-    }, err => {
-      this.quote = new Quote("Winston Churchill", "Never give up!");
-      console.log("An error occured.");
-    })
+    this.quotesService.quoteRequest();
+    this.quote = this.quotesService.quote;
   }
-
 }
